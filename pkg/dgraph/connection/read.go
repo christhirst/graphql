@@ -29,26 +29,35 @@ var decode struct {
 
 func (dg DGraph) GetJson(c *dgo.Dgraph) map[string]interface{} {
 
-/* 	qq := `query all($a: string) {
-		all(func: eq(name, $a)) {
-		  name
+	qq := `query Alice($a: string){
+		me(func: eq(name, $a)) {
+			name
 		}
-	  }` */
+	}`
+	variables := make(map[string]string)
+	variables["$a"] = "Alice"
+	fmt.Println(c)
 
-	g, _ := c.NewReadOnlyTxn().Query(context.Background(), q)
-	json.Unmarshal(g.GetJson(), &result)
+	resp, err := c.NewReadOnlyTxn().QueryWithVars(context.Background(), qq, variables)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(resp.Json))
+	fmt.Println(resp.Size())
+	json.Unmarshal(resp.GetJson(), &result)
 
 	jsonString, _ := json.Marshal(result)
 	fmt.Println("xx")
 
 	fmt.Println(string(jsonString))
 
-	if err := json.Unmarshal(g.GetJson(), &decode); err != nil {
+	if err := json.Unmarshal(resp.GetJson(), &decode); err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("sss")
-	fmt.Println(g)
+	fmt.Println(resp)
 	fmt.Println(decode)
 	fmt.Println("sss")
 

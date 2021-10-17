@@ -1,7 +1,9 @@
 package connection
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/dgraph-io/dgo/v210"
 	"github.com/dgraph-io/dgo/v210/protos/api"
@@ -9,17 +11,23 @@ import (
 )
 
 type DGraph struct {
-	con *dgo.Dgraph
+	client *dgo.Dgraph
+	conn   *grpc.ClientConn
 }
 
-func (dg DGraph) NewClient() error {
+func (dg *DGraph) NewClient() error {
 
 	// Dial a gRPC connection. The address to dial to can be configured when
 	// setting up the dgraph cluster.
-	d, err := grpc.Dial("cold-meadow.grpc.eu-central-1.aws.cloud.dgraph.io:443", grpc.WithInsecure())
+
+	conn, err := dgo.DialCloud("https://cold-meadow.eu-central-1.aws.cloud.dgraph.io/graphql", os.Getenv("dgraph_admin"))
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	dg.con = dgo.NewDgraphClient(api.NewDgraphClient(d))
+
+	dg.conn = conn
+	fmt.Println(conn)
+	dg.client = dgo.NewDgraphClient(api.NewDgraphClient(conn))
 	return err
 }

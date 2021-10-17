@@ -1,11 +1,21 @@
 package connection
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
 
 func TestGetJson(t *testing.T) {
-   //var c DGraph  
-   
-   
+	var c DGraph
+	err := c.NewClient()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c.GetJson(c.client)
+	//defer c.conn.Close()
+
 }
 
 /* tests := map[string]struct {
